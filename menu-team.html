@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Menu Team — In-Process Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f1;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --text: #1a1916;
+    --text-muted: #7a7870;
+    --text-faint: #b0ae a6;
+    --accent: #1a1916;
+    --green: #2d6a4f;
+    --green-bg: #d8f3dc;
+    --amber: #7d4e00;
+    --amber-bg: #fff0cc;
+    --red: #9b2226;
+    --red-bg: #fde8e8;
+    --blue: #1a4e8a;
+    --blue-bg: #dbeafe;
+    --purple: #5b21b6;
+    --purple-bg: #ede9fe;
+    --orange: #92400e;
+    --orange-bg: #fef3c7;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--text);
+    color: #fff;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-brand span {
+    opacity: 0.45;
+    font-weight: 400;
+  }
+  .header-right {
+    font-size: 12px;
+    opacity: 0.5;
+    font-family: var(--mono);
+  }
+
+  /* MAIN */
+  main { max-width: 1400px; margin: 0 auto; padding: 28px 32px 60px; }
+
+  /* PAGE TITLE */
+  .page-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .page-title h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .page-title .subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-family: var(--mono);
+  }
+  .page-title .actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface2); border-color: #ccc; }
+  .btn.primary { background: var(--text); color: #fff; border-color: var(--text); }
+  .btn.primary:hover { background: #333; }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .filter-bar input,
+  .filter-bar select {
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .filter-bar input:focus,
+  .filter-bar select:focus { border-color: var(--text); }
+  .filter-bar input { flex: 1; min-width: 180px; }
+  .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card:hover { border-color: #aaa; }
+  .stat-card.active { border-color: var(--text); box-shadow: 0 0 0 2px var(--text); }
+  .stat-card .stat-num {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .stat-card .stat-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-family: var(--mono);
+  }
+  .stat-card.backlog .stat-num { color: var(--red); }
+  .stat-card.final .stat-num { color: var(--orange); }
+  .stat-card.no-config .stat-num { color: var(--amber); }
+
+  /* CHARTS ROW */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .chart-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+    cursor: pointer;
+  }
+  .bar-row:hover .bar-fill { filter: brightness(0.9); }
+  .bar-label { font-size: 11px; width: 110px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+  .bar-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: var(--text); transition: width 0.4s ease; }
+  .bar-count { font-size: 11px; font-family: var(--mono); color: var(--text-muted); width: 24px; text-align: right; flex-shrink: 0; }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .table-header-left {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th {
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  thead th:hover { color: var(--text); }
+  thead th.sort-asc::after { content: ' ↑'; }
+  thead th.sort-desc::after { content: ' ↓'; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  tbody tr.backlogged { opacity: 0.7; }
+  tbody td { padding: 9px 12px; vertical-align: middle; }
+  .td-account { font-weight: 500; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .td-rep { color: var(--text-muted); white-space: nowrap; }
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .empty-state strong { display: block; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    gap: 4px;
+  }
+  .b-green  { background: var(--green-bg);  color: var(--green); }
+  .b-amber  { background: var(--amber-bg);  color: var(--amber); }
+  .b-red    { background: var(--red-bg);    color: var(--red); }
+  .b-blue   { background: var(--blue-bg);   color: var(--blue); }
+  .b-purple { background: var(--purple-bg); color: var(--purple); }
+  .b-orange { background: var(--orange-bg); color: var(--orange); }
+  .b-gray   { background: var(--surface2);  color: var(--text-muted); border: 1px solid var(--border); }
+  .none     { color: var(--text-muted); font-family: var(--mono); font-size: 11px; }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 20px;
+    background: var(--surface);
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: var(--text); background: var(--surface2); }
+  .upload-zone p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+  .upload-zone strong { font-size: 15px; display: block; margin-bottom: 6px; }
+  .upload-zone.hidden { display: none; }
+
+  @media (max-width: 900px) {
+    .charts-row { grid-template-columns: 1fr; }
+    main { padding: 16px; }
+    header { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    SpotOn <span>/</span> Menu Team
+  </div>
+  <div class="header-right" id="last-updated">No data loaded</div>
+</header>
+
+<main>
+
+  <div class="page-title">
+    <div>
+      <h1>In-Process Accounts</h1>
+      <div class="subtitle" id="subtitle">Load a CSV export to get started</div>
+    </div>
+    <div class="actions">
+      <label class="btn" style="cursor:pointer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Load CSV
+        <input type="file" accept=".csv" id="csv-input" style="display:none" />
+      </label>
+      <button class="btn" id="export-btn" onclick="exportCSV()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload zone (shown when no data) -->
+  <div class="upload-zone" id="upload-zone">
+    <strong>Drop your Salesforce CSV export here</strong>
+    <p>Or click "Load CSV" above — expects columns: Rep, Account, Status, Sub Status, Config Call Date, Follow Up Menu Consult Date, Final CC Date, Backlog Status, Backlog Sub Status</p>
+    <p style="margin-top:8px;font-size:11px;font-family:var(--mono)">Data stays in your browser — nothing is uploaded anywhere</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid" style="display:none">
+    <div class="stat-card" onclick="clearFilters()">
+      <div class="stat-num" id="s-total">—</div>
+      <div class="stat-label">Total accounts</div>
+      <div class="stat-desc">in view</div>
+    </div>
+    <div class="stat-card backlog" onclick="toggleFilter('backlog','backlog')">
+      <div class="stat-num" id="s-backlog">—</div>
+      <div class="stat-label">Backlogged</div>
+      <div class="stat-desc">Non-Workable</div>
+    </div>
+    <div class="stat-card final" onclick="toggleFilter('date','final')">
+      <div class="stat-num" id="s-final">—</div>
+      <div class="stat-label">Final CC set</div>
+      <div class="stat-desc">Has final CC date</div>
+    </div>
+    <div class="stat-card no-config" onclick="toggleFilter('date','no-config')">
+      <div class="stat-num" id="s-no-config">—</div>
+      <div class="stat-label">No config date</div>
+      <div class="stat-desc">Needs scheduling</div>
+    </div>
+    <div class="stat-card" onclick="toggleFilter('substatus','Need MC Scheduled')">
+      <div class="stat-num" id="s-need-mc">—</div>
+      <div class="stat-label">Need MC scheduled</div>
+      <div class="stat-desc">Action needed</div>
+    </div>
+    <div class="stat-card" onclick="toggleFilter('substatus','Need F/U MC Scheduled')">
+      <div class="stat-num" id="s-need-fu">—</div>
+      <div class="stat-label">Need F/U MC</div>
+      <div class="stat-desc">Follow-up pending</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row" id="charts-row" style="display:none">
+    <div class="chart-card">
+      <div class="chart-title">Accounts by rep</div>
+      <div id="chart-rep"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Accounts by status</div>
+      <div id="chart-status"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Accounts by sub-status</div>
+      <div id="chart-substatus"></div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar" id="filter-bar" style="display:none">
+    <span class="filter-label">Filter</span>
+    <input type="text" id="search" placeholder="Search account or rep…" oninput="render()" />
+    <select id="f-rep" onchange="render()"><option value="">All reps</option></select>
+    <select id="f-status" onchange="render()">
+      <option value="">All statuses</option>
+      <option>Menu Build</option>
+      <option>Menu Consultation</option>
+      <option>Pre-Install Verification</option>
+      <option>Installation</option>
+      <option>Onboarding</option>
+    </select>
+    <select id="f-backlog" onchange="render()">
+      <option value="">All accounts</option>
+      <option value="backlog">Backlogged only</option>
+      <option value="active">Active only</option>
+    </select>
+    <select id="f-date" onchange="render()">
+      <option value="">All dates</option>
+      <option value="config">Has config call date</option>
+      <option value="followup">Has follow-up MC date</option>
+      <option value="final">Has final CC date</option>
+      <option value="no-config">No config date</option>
+    </select>
+    <select id="f-substatus" onchange="render()">
+      <option value="">All sub-statuses</option>
+      <option>Menu Building</option>
+      <option>Ready for Menu Build</option>
+      <option>MC Scheduled</option>
+      <option>F/U MC Scheduled</option>
+      <option>Need MC Scheduled</option>
+      <option>Need F/U MC Scheduled</option>
+      <option>Missing Menus</option>
+      <option>Proposed</option>
+      <option>Install Scheduled</option>
+      <option>Ready to Verify</option>
+      <option>Ready to Schedule</option>
+    </select>
+    <button class="btn" onclick="clearFilters()" style="margin-left:auto">Clear</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" id="table-wrap" style="display:none">
+    <div class="table-header">
+      <div class="table-header-left" id="table-count">— accounts</div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('Account')">Account</th>
+            <th onclick="sortBy('Rep')">Rep</th>
+            <th onclick="sortBy('Status')">Status</th>
+            <th onclick="sortBy('Sub Status')">Sub-status</th>
+            <th onclick="sortBy('Config Call Date')">Config call date</th>
+            <th onclick="sortBy('Follow Up Menu Consult Date')">Follow-up MC date</th>
+            <th onclick="sortBy('Final CC Date')">Final CC date</th>
+            <th onclick="sortBy('Backlog Status')">Backlog</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let ALL_DATA = [];
+let sortCol = 'Rep';
+let sortDir = 'asc';
+
+// CSV parsing
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (!lines.length) return [];
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let c of line) {
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    vals.push(cur.trim());
+    const row = {};
+    headers.forEach((h, i) => { row[h] = (vals[i] || '').replace(/^"|"$/g,''); });
+    return row;
+  });
+}
+
+// Column mapping — handle Salesforce export column names
+function normalizeRow(r) {
+  const get = (...keys) => { for (const k of keys) if (r[k] !== undefined) return r[k] || ''; return ''; };
+  return {
+    Rep: get('Menu Consult Resource', 'Rep', 'Owner', 'Case Owner'),
+    Account: get('Account Text Name', 'Account', 'Account Name'),
+    Status: get('Status', 'Status  ↑'),
+    'Sub Status': get('Sub Status', 'Sub Status  ↑'),
+    'Config Call Date': get('Config Call Date'),
+    'Follow Up Menu Consult Date': get('Follow Up Menu Consult Date'),
+    'Final CC Date': get('Final CC Date'),
+    'Backlog Status': get('Backlog Status'),
+    'Backlog Sub Status': get('Backlog Sub Status'),
+  };
+}
+
+// Load CSV
+document.getElementById('csv-input').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const raw = parseCSV(ev.target.result);
+    ALL_DATA = raw.map(normalizeRow).filter(r => r.Account && r.Account !== '1' && r.Account !== '2' && !/^\d+$/.test(r.Account));
+    document.getElementById('last-updated').textContent = 'Loaded ' + new Date().toLocaleString();
+    document.getElementById('subtitle').textContent = f.name + ' — ' + ALL_DATA.length + ' accounts';
+    document.getElementById('upload-zone').classList.add('hidden');
+    document.getElementById('stats-grid').style.display = '';
+    document.getElementById('charts-row').style.display = '';
+    document.getElementById('filter-bar').style.display = '';
+    document.getElementById('table-wrap').style.display = '';
+    populateRepFilter();
+    render();
+  };
+  reader.readAsText(f);
+  e.target.value = '';
+});
+
+// Drag and drop on upload zone
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const raw = parseCSV(ev.target.result);
+    ALL_DATA = raw.map(normalizeRow).filter(r => r.Account && !/^\d+$/.test(r.Account));
+    document.getElementById('last-updated').textContent = 'Loaded ' + new Date().toLocaleString();
+    document.getElementById('subtitle').textContent = f.name + ' — ' + ALL_DATA.length + ' accounts';
+    zone.classList.add('hidden');
+    document.getElementById('stats-grid').style.display = '';
+    document.getElementById('charts-row').style.display = '';
+    document.getElementById('filter-bar').style.display = '';
+    document.getElementById('table-wrap').style.display = '';
+    populateRepFilter();
+    render();
+  };
+  reader.readAsText(f);
+});
+zone.addEventListener('click', () => document.getElementById('csv-input').click());
+
+function populateRepFilter() {
+  const sel = document.getElementById('f-rep');
+  sel.innerHTML = '<option value="">All reps</option>';
+  [...new Set(ALL_DATA.map(d => d.Rep))].filter(Boolean).sort().forEach(r => {
+    const o = document.createElement('option'); o.value = r; o.textContent = r; sel.appendChild(o);
+  });
+}
+
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const rep = document.getElementById('f-rep').value;
+  const st = document.getElementById('f-status').value;
+  const bl = document.getElementById('f-backlog').value;
+  const dt = document.getElementById('f-date').value;
+  const ss = document.getElementById('f-substatus').value;
+
+  return ALL_DATA.filter(d => {
+    if (rep && d.Rep !== rep) return false;
+    if (q && !d.Account.toLowerCase().includes(q) && !d.Rep.toLowerCase().includes(q)) return false;
+    if (st && d.Status !== st) return false;
+    if (bl === 'backlog' && !d['Backlog Status']) return false;
+    if (bl === 'active' && d['Backlog Status']) return false;
+    if (dt === 'config' && !d['Config Call Date']) return false;
+    if (dt === 'followup' && !d['Follow Up Menu Consult Date']) return false;
+    if (dt === 'final' && !d['Final CC Date']) return false;
+    if (dt === 'no-config' && d['Config Call Date']) return false;
+    if (ss && d['Sub Status'] !== ss) return false;
+    return true;
+  });
+}
+
+function toggleFilter(type, val) {
+  if (type === 'backlog') {
+    const el = document.getElementById('f-backlog');
+    el.value = el.value === 'backlog' ? '' : 'backlog';
+  } else if (type === 'date') {
+    const el = document.getElementById('f-date');
+    el.value = el.value === val ? '' : val;
+  } else if (type === 'substatus') {
+    const el = document.getElementById('f-substatus');
+    el.value = el.value === val ? '' : val;
+  }
+  render();
+}
+
+function clearFilters() {
+  document.getElementById('search').value = '';
+  document.getElementById('f-rep').value = '';
+  document.getElementById('f-status').value = '';
+  document.getElementById('f-backlog').value = '';
+  document.getElementById('f-date').value = '';
+  document.getElementById('f-substatus').value = '';
+  render();
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  document.querySelectorAll('thead th').forEach(th => { th.classList.remove('sort-asc','sort-desc'); });
+  const ths = document.querySelectorAll('thead th');
+  const cols = ['Account','Rep','Status','Sub Status','Config Call Date','Follow Up Menu Consult Date','Final CC Date','Backlog Status'];
+  const idx = cols.indexOf(col);
+  if (idx >= 0) ths[idx].classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+  render();
+}
+
+function statusBadge(s) {
+  if (!s) return '<span class="none">—</span>';
+  const map = { 'Menu Build':'b-blue','Menu Consultation':'b-purple','Installation':'b-green','Pre-Install Verification':'b-amber','Onboarding':'b-orange' };
+  return `<span class="badge ${map[s]||'b-gray'}">${s}</span>`;
+}
+function subBadge(s) {
+  if (!s) return '<span class="none">—</span>';
+  const warn = ['Need MC Scheduled','Need F/U MC Scheduled','Missing Menus'];
+  return `<span class="badge ${warn.includes(s)?'b-red':'b-gray'}">${s}</span>`;
+}
+function dateBadge(d, cls) {
+  if (!d) return '<span class="none">—</span>';
+  return `<span class="badge ${cls}">${d}</span>`;
+}
+function backlogBadge(d) {
+  if (!d['Backlog Status']) return '<span class="none">—</span>';
+  const label = d['Backlog Sub Status'] || d['Backlog Status'];
+  return `<span class="badge b-red">${label}</span>`;
+}
+
+function buildChart(containerId, data, filterType) {
+  const el = document.getElementById(containerId);
+  const max = Math.max(...Object.values(data), 1);
+  el.innerHTML = Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v]) => `
+    <div class="bar-row" onclick="toggleFilter('${filterType}','${k.replace(/'/g,"\\'")}')">
+      <div class="bar-label" title="${k}">${k||'—'}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max*100)}%"></div></div>
+      <div class="bar-count">${v}</div>
+    </div>`).join('');
+}
+
+function render() {
+  const filtered = getFiltered();
+  const sorted = [...filtered].sort((a,b) => {
+    const av = a[sortCol]||'', bv = b[sortCol]||'';
+    return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+
+  // Stats
+  document.getElementById('s-total').textContent = ALL_DATA.length;
+  document.getElementById('s-backlog').textContent = ALL_DATA.filter(d=>d['Backlog Status']).length;
+  document.getElementById('s-final').textContent = ALL_DATA.filter(d=>d['Final CC Date']).length;
+  document.getElementById('s-no-config').textContent = ALL_DATA.filter(d=>!d['Config Call Date']).length;
+  document.getElementById('s-need-mc').textContent = ALL_DATA.filter(d=>d['Sub Status']==='Need MC Scheduled').length;
+  document.getElementById('s-need-fu').textContent = ALL_DATA.filter(d=>d['Sub Status']==='Need F/U MC Scheduled').length;
+
+  // Charts (use filtered)
+  const repCounts = {}, stCounts = {}, ssCounts = {};
+  filtered.forEach(d => {
+    repCounts[d.Rep] = (repCounts[d.Rep]||0)+1;
+    if (d.Status) stCounts[d.Status] = (stCounts[d.Status]||0)+1;
+    if (d['Sub Status']) ssCounts[d['Sub Status']] = (ssCounts[d['Sub Status']]||0)+1;
+  });
+  buildChart('chart-rep', repCounts, 'rep');
+  buildChart('chart-status', stCounts, 'status');
+  buildChart('chart-substatus', ssCounts, 'substatus');
+
+  // Table count
+  document.getElementById('table-count').textContent = filtered.length + ' account' + (filtered.length !== 1 ? 's' : '') + ' shown';
+
+  // Table rows
+  const tbody = document.getElementById('tbody');
+  if (!sorted.length) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><strong>No accounts match</strong>Try adjusting your filters</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = sorted.map(d => `
+    <tr class="${d['Backlog Status']?'backlogged':''}">
+      <td class="td-account" title="${d.Account}">${d.Account}</td>
+      <td class="td-rep">${d.Rep||'—'}</td>
+      <td>${statusBadge(d.Status)}</td>
+      <td>${subBadge(d['Sub Status'])}</td>
+      <td>${dateBadge(d['Config Call Date'],'b-green')}</td>
+      <td>${dateBadge(d['Follow Up Menu Consult Date'],'b-amber')}</td>
+      <td>${dateBadge(d['Final CC Date'],'b-orange')}</td>
+      <td>${backlogBadge(d)}</td>
+    </tr>`).join('');
+}
+
+// Export
+function exportCSV() {
+  if (!ALL_DATA.length) return;
+  const cols = ['Rep','Account','Status','Sub Status','Config Call Date','Follow Up Menu Consult Date','Final CC Date','Backlog Status','Backlog Sub Status'];
+  const filtered = getFiltered();
+  const rows = [cols.join(','), ...filtered.map(r => cols.map(c => `"${(r[c]||'').replace(/"/g,'""')}"`).join(','))];
+  const blob = new Blob([rows.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'menu-team-export.csv'; a.click();
+}
+</script>
+</body>
+</html>
